@@ -215,8 +215,23 @@ impl ServerHandler for LinkedInMcpServer {
         ServerInfo::new(ServerCapabilities::builder().enable_tools().build())
             .with_server_info(Implementation::new("linkedin-mcp", env!("CARGO_PKG_VERSION")))
             .with_instructions(
-                "LinkedIn MCP server. Tools: get_profile, create_text_post, create_image_post, auth_status. \
-                 On first use, an OAuth flow will start — open the printed URL in your browser to authorize."
+                "LinkedIn MCP server for publishing content to LinkedIn. \
+                 You can publish posts on behalf of the authenticated LinkedIn user.\n\n\
+                 Available tools:\n\
+                 - create_text_post: Publish a text-only post (up to 3000 chars). Use for announcements, thoughts, updates.\n\
+                 - share_url: Share a URL/link with a preview card. LinkedIn auto-fetches title and thumbnail from the page. \
+                   Use this for sharing articles, blog posts, GitHub repos, or any web content.\n\
+                 - create_image_post: Publish a post with an attached image (provide local file path). \
+                   Use for infographics, screenshots, photos.\n\
+                 - create_video_post: Publish a post with an attached video (provide local file path). \
+                   Use for demos, tutorials, event recordings.\n\
+                 - get_profile: Get the authenticated user's LinkedIn profile (name, email, ID, picture).\n\
+                 - auth_status: Check if OAuth token is valid and when it expires.\n\n\
+                 All post tools accept an optional 'visibility' parameter: 'PUBLIC' (default) or 'CONNECTIONS'.\n\n\
+                 Note: This server publishes as a personal profile, not a Company Page. \
+                 LinkedIn API does not support creating native long-form articles or newsletters — \
+                 those can only be created through the LinkedIn web UI. \
+                 To share an article, use share_url with the article's URL."
                     .to_string(),
             )
     }
