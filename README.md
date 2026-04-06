@@ -46,16 +46,17 @@ cargo build --release
 
 ## LinkedIn App Setup
 
-Before using this MCP server, you need a LinkedIn Developer App:
+Before using this MCP server, you need a LinkedIn Developer App with two products enabled.
 
-1. Go to [LinkedIn Developer Portal](https://www.linkedin.com/developers/apps) and click **Create app**
-2. Fill in the app details (name, logo, company page)
-3. In the **Products** tab, add:
-   - **Share on LinkedIn** (grants `w_member_social` scope — required for posting)
-   - **Sign In with LinkedIn using OpenID Connect** (grants `openid profile email` scopes — required for profile info)
-4. In the **Auth** tab:
+1. **Create an app** — follow LinkedIn's official guide: [Getting Access to LinkedIn APIs](https://learn.microsoft.com/en-us/linkedin/shared/authentication/getting-access)
+2. **Add required products** in the Products tab ([Managing Your Application](https://learn.microsoft.com/en-us/linkedin/shared/authentication/managing-your-application)):
+   - **Share on LinkedIn** — grants `w_member_social` scope (required for posting)
+   - **Sign In with LinkedIn using OpenID Connect** — grants `openid profile email` scopes (required for profile info)
+3. **Configure OAuth** in the Auth tab:
    - Copy your **Client ID** and **Client Secret**
    - Add `http://localhost:3000/callback` under **Authorized redirect URLs**
+
+For full details on LinkedIn OAuth 2.0, see: [Authorization Code Flow](https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow)
 
 ## Security
 
