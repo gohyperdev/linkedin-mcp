@@ -74,7 +74,9 @@ Add to your Claude Desktop MCP configuration (`~/Library/Application Support/Cla
 |---|---|
 | `get_profile` | Get LinkedIn profile info (name, email, ID, picture URL) |
 | `create_text_post` | Create a text-only post. Params: `text`, optional `visibility` (PUBLIC/CONNECTIONS) |
+| `share_url` | Share a URL with preview card. Params: `text`, `url`, optional `title`, `description`, `visibility` |
 | `create_image_post` | Create a post with an image. Params: `text`, `image_path`, optional `image_alt`, `visibility` |
+| `create_video_post` | Create a post with a video. Params: `text`, `video_path`, optional `title`, `description`, `visibility` |
 | `auth_status` | Check authentication status, token expiry, associated email |
 
 ## Authentication

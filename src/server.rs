@@ -19,6 +19,40 @@ pub struct CreateTextPostParams {
 }
 
 #[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
+pub struct ShareUrlParams {
+    /// The text commentary for the post
+    pub text: String,
+    /// The URL to share (LinkedIn will render a preview card)
+    pub url: String,
+    /// Custom title for the URL preview (optional — LinkedIn auto-fetches from Open Graph if omitted)
+    #[serde(default)]
+    pub title: Option<String>,
+    /// Custom description for the URL preview (optional)
+    #[serde(default)]
+    pub description: Option<String>,
+    /// Post visibility: "PUBLIC" or "CONNECTIONS" (default: "PUBLIC")
+    #[serde(default)]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
+pub struct CreateVideoPostParams {
+    /// The text content of the LinkedIn post
+    pub text: String,
+    /// Absolute path to the video file on disk
+    pub video_path: String,
+    /// Title for the video (optional)
+    #[serde(default)]
+    pub title: Option<String>,
+    /// Description for the video (optional)
+    #[serde(default)]
+    pub description: Option<String>,
+    /// Post visibility: "PUBLIC" or "CONNECTIONS" (default: "PUBLIC")
+    #[serde(default)]
+    pub visibility: Option<String>,
+}
+
+#[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
 pub struct CreateImagePostParams {
     /// The text content of the LinkedIn post
     pub text: String,
@@ -100,6 +134,54 @@ impl LinkedInMcpServer {
 
         Ok(CallToolResult::success(vec![Content::text(format!(
             "Image post created successfully.\nPost URN: {post_urn}"
+        ))]))
+    }
+
+    /// Share a URL/article on LinkedIn with an optional custom title and description.
+    #[tool(description = "Share a URL on LinkedIn with preview card (title, description auto-fetched from Open Graph if not provided)")]
+    async fn share_url(
+        &self,
+        Parameters(params): Parameters<ShareUrlParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let visibility = params.visibility.as_deref().unwrap_or("PUBLIC");
+        let client = LinkedInClient::new();
+        let post_urn = client
+            .create_article_post(
+                &params.text,
+                &params.url,
+                params.title.as_deref(),
+                params.description.as_deref(),
+                visibility,
+            )
+            .await
+            .map_err(|e| e.to_mcp_error())?;
+
+        Ok(CallToolResult::success(vec![Content::text(format!(
+            "URL shared successfully.\nPost URN: {post_urn}"
+        ))]))
+    }
+
+    /// Create a post with a video on LinkedIn.
+    #[tool(description = "Create a post with a video on LinkedIn")]
+    async fn create_video_post(
+        &self,
+        Parameters(params): Parameters<CreateVideoPostParams>,
+    ) -> Result<CallToolResult, McpError> {
+        let visibility = params.visibility.as_deref().unwrap_or("PUBLIC");
+        let client = LinkedInClient::new();
+        let post_urn = client
+            .create_video_post(
+                &params.text,
+                &params.video_path,
+                params.title.as_deref(),
+                params.description.as_deref(),
+                visibility,
+            )
+            .await
+            .map_err(|e| e.to_mcp_error())?;
+
+        Ok(CallToolResult::success(vec![Content::text(format!(
+            "Video post created successfully.\nPost URN: {post_urn}"
         ))]))
     }
 
