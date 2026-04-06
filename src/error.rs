@@ -2,7 +2,7 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum LinkedInError {
-    #[error("Not authenticated. Run the auth flow first.")]
+    #[error("Not authenticated. Run: LINKEDIN_CLIENT_ID=<id> LINKEDIN_CLIENT_SECRET=<secret> linkedin-mcp/auth-cli.sh")]
     NotAuthenticated,
 
     #[error("Token expired and refresh failed: {0}")]

@@ -28,10 +28,10 @@ impl TokenData {
 }
 
 fn tokens_path() -> PathBuf {
-    let config_dir = dirs::config_dir()
-        .unwrap_or_else(|| PathBuf::from("."))
-        .join("linkedin-mcp");
-    config_dir.join("tokens.json")
+    // Use ~/.config/linkedin-mcp/ (XDG standard) on all platforms,
+    // not dirs::config_dir() which returns ~/Library/Application Support/ on macOS.
+    let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
+    home.join(".config").join("linkedin-mcp").join("tokens.json")
 }
 
 fn get_client_credentials() -> Result<(String, String), LinkedInError> {
@@ -74,16 +74,10 @@ pub async fn get_valid_token() -> Result<TokenData, LinkedInError> {
                     save_tokens(&refreshed).await?;
                     Ok(refreshed)
                 }
-                Err(e) => {
-                    tracing::warn!("Refresh failed: {e}, starting new auth flow");
-                    run_auth_flow().await
-                }
+                Err(_) => Err(LinkedInError::NotAuthenticated),
             }
         }
-        None => {
-            tracing::info!("No tokens found, starting auth flow");
-            run_auth_flow().await
-        }
+        None => Err(LinkedInError::NotAuthenticated),
     }
 }
 
