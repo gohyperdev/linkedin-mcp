@@ -19,7 +19,7 @@ pub struct CreateTextPostParams {
 }
 
 #[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
-pub struct ShareUrlParams {
+pub struct ShareArticleParams {
     /// The text commentary for the post
     pub text: String,
     /// The URL to share (LinkedIn will render a preview card)
@@ -137,11 +137,11 @@ impl LinkedInMcpServer {
         ))]))
     }
 
-    /// Share a URL/article on LinkedIn with an optional custom title and description.
-    #[tool(description = "Share a URL on LinkedIn with preview card (title, description auto-fetched from Open Graph if not provided)")]
-    async fn share_url(
+    /// Share an article (URL) on LinkedIn — this is LinkedIn's ARTICLE post type.
+    #[tool(description = "Publish an article on LinkedIn (shareMediaCategory=ARTICLE). Shares a URL with a rich preview card showing title, description, and thumbnail. This IS the way to publish articles on LinkedIn via API. Title and description are auto-fetched from the page if not provided.")]
+    async fn share_article(
         &self,
-        Parameters(params): Parameters<ShareUrlParams>,
+        Parameters(params): Parameters<ShareArticleParams>,
     ) -> Result<CallToolResult, McpError> {
         let visibility = params.visibility.as_deref().unwrap_or("PUBLIC");
         let client = LinkedInClient::new();
@@ -219,9 +219,10 @@ impl ServerHandler for LinkedInMcpServer {
                  You can publish posts on behalf of the authenticated LinkedIn user.\n\n\
                  Available tools:\n\
                  - create_text_post: Publish a text-only post (up to 3000 chars). Use for announcements, thoughts, updates.\n\
-                 - share_url: Share an Article or URL (shareMediaCategory=ARTICLE). Creates a post with a rich preview card \
+                 - share_article: PUBLISH AN ARTICLE on LinkedIn (shareMediaCategory=ARTICLE). \
+                   This is LinkedIn's official Article post type. Creates a post with a rich preview card \
                    showing title, description, and thumbnail. LinkedIn auto-fetches metadata from the page's Open Graph tags. \
-                   Use this for sharing articles, blog posts, GitHub repos, or any web content. \
+                   Use this when the user asks to publish/share an article, blog post, link, URL, or web content. \
                    You can override title and description with custom values.\n\
                  - create_image_post: Publish a post with an attached image (provide local file path). \
                    Use for infographics, screenshots, photos.\n\
@@ -231,9 +232,9 @@ impl ServerHandler for LinkedInMcpServer {
                  - auth_status: Check if OAuth token is valid and when it expires.\n\n\
                  All post tools accept an optional 'visibility' parameter: 'PUBLIC' (default) or 'CONNECTIONS'.\n\n\
                  Note: This server publishes as a personal profile, not a Company Page. \
-                 The ARTICLE type (share_url) shares external URLs with a preview card — this is fully supported. \
-                 However, native LinkedIn long-form articles (written in LinkedIn's rich-text editor) and \
-                 LinkedIn Newsletter editions cannot be created via the API — those require the LinkedIn web UI."
+                 When a user asks to 'publish an article', use share_article — it creates a LinkedIn ARTICLE post. \
+                 The only article type NOT supported is native LinkedIn long-form articles written directly \
+                 in LinkedIn's built-in rich-text editor — those and Newsletter editions require the web UI."
                     .to_string(),
             )
     }
