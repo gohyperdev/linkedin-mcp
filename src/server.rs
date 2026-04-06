@@ -137,8 +137,8 @@ impl LinkedInMcpServer {
         ))]))
     }
 
-    /// Share an article (URL) on LinkedIn — this is LinkedIn's ARTICLE post type.
-    #[tool(description = "Publish an article on LinkedIn (shareMediaCategory=ARTICLE). Shares a URL with a rich preview card showing title, description, and thumbnail. This IS the way to publish articles on LinkedIn via API. Title and description are auto-fetched from the page if not provided.")]
+    /// Share a URL on LinkedIn with a rich preview card (LinkedIn calls this shareMediaCategory=ARTICLE).
+    #[tool(description = "Share a URL/link on LinkedIn with a rich preview card (thumbnail, title, description). NOT a native LinkedIn article — this creates a regular feed post with a link preview. Title and description are auto-fetched from the page if not provided.")]
     async fn share_article(
         &self,
         Parameters(params): Parameters<ShareArticleParams>,
@@ -219,11 +219,9 @@ impl ServerHandler for LinkedInMcpServer {
                  You can publish posts on behalf of the authenticated LinkedIn user.\n\n\
                  Available tools:\n\
                  - create_text_post: Publish a text-only post (up to 3000 chars). Use for announcements, thoughts, updates.\n\
-                 - share_article: PUBLISH AN ARTICLE on LinkedIn (shareMediaCategory=ARTICLE). \
-                   This is LinkedIn's official Article post type. Creates a post with a rich preview card \
-                   showing title, description, and thumbnail. LinkedIn auto-fetches metadata from the page's Open Graph tags. \
-                   Use this when the user asks to publish/share an article, blog post, link, URL, or web content. \
-                   You can override title and description with custom values.\n\
+                 - share_article: Share a URL/link as a feed post with a rich preview card (thumbnail, title, description). \
+                   Despite the name, this does NOT create a native LinkedIn article — it creates a regular post with a link preview. \
+                   Use when the user wants to share a link, blog post, or web page.\n\
                  - create_image_post: Publish a post with an attached image (provide local file path). \
                    Use for infographics, screenshots, photos.\n\
                  - create_video_post: Publish a post with an attached video (provide local file path). \
@@ -232,9 +230,10 @@ impl ServerHandler for LinkedInMcpServer {
                  - auth_status: Check if OAuth token is valid and when it expires.\n\n\
                  All post tools accept an optional 'visibility' parameter: 'PUBLIC' (default) or 'CONNECTIONS'.\n\n\
                  Note: This server publishes as a personal profile, not a Company Page. \
-                 When a user asks to 'publish an article', use share_article — it creates a LinkedIn ARTICLE post. \
-                 The only article type NOT supported is native LinkedIn long-form articles written directly \
-                 in LinkedIn's built-in rich-text editor — those and Newsletter editions require the web UI."
+                 IMPORTANT: This server CANNOT create native LinkedIn articles (long-form content at linkedin.com/pulse/...) \
+                 or LinkedIn Newsletter editions. Those have no public API and can only be created through the LinkedIn web UI. \
+                 If a user asks to 'write an article on LinkedIn', explain this limitation and offer alternatives: \
+                 a text post (up to 3000 chars) or sharing a link to an article hosted elsewhere."
                     .to_string(),
             )
     }
