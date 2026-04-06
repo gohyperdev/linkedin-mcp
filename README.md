@@ -1,6 +1,21 @@
 # linkedin-mcp
 
-A Model Context Protocol (MCP) server that lets AI agents publish posts to LinkedIn. Built in Rust for performance, using the official [MCP Rust SDK](https://github.com/modelcontextprotocol/rust-sdk) (`rmcp`).
+The first and only LinkedIn MCP server built in Rust. Publish posts to LinkedIn from AI agents (Claude Code, Claude Desktop, or any MCP-compatible client) using the official [MCP Rust SDK](https://github.com/modelcontextprotocol/rust-sdk) (`rmcp`).
+
+## Why Rust?
+
+Most MCP servers are written in TypeScript (Bun/Node.js). That works fine for a single agent, but in multi-agent environments — where dozens of MCP servers run simultaneously across multiple Claude Code sessions — the resource overhead adds up fast:
+
+| | TypeScript (Bun/Node) | Rust |
+|---|---|---|
+| **Memory per process** | 50–150 MB (V8 heap + runtime) | 5–15 MB |
+| **Startup time** | 200–500 ms | < 10 ms |
+| **10 MCP servers** | 0.5–1.5 GB RAM | 50–150 MB RAM |
+| **CPU at idle** | JS garbage collector spikes | near zero |
+
+In a real-world scenario with 5 Claude Code sessions, each running 4–6 MCP servers, TypeScript runtimes can consume **3–8 GB of RAM** just for MCP infrastructure — leaving less for the actual work. We experienced this firsthand: orphaned Bun processes from a Telegram MCP plugin consumed 8 CPU cores and forced fan noise on a MacBook Pro.
+
+Rust MCP servers are single static binaries with no runtime, no garbage collector, and no dependency on Node/Bun/npm. They start instantly, use minimal memory, and disappear cleanly when the session ends.
 
 ## Features
 
